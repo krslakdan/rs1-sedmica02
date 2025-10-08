@@ -1,3 +1,6 @@
+using MojaApp.API.Data;
+using MojaApp.API.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,5 +24,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+StudentStorage.Students.Add(new Student() { Id = 1, Ime="A", Prezime="B" });
+StudentStorage.Students.Add(new Student() { Id = 2, Ime = "C", Prezime = "D" });
 
 app.Run();
