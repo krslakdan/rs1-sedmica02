@@ -17,5 +17,20 @@ namespace MojaApp.API.Controllers
                 throw new Exception("nema studenta");
             return s;
         }
+
+        [HttpPost]
+        public Student Add(string ime, string prezime)
+        {
+            var maxID = StudentStorage.Students.Max(x => x.Id);
+
+            var s = new Student
+            {
+                Id = maxID + 1,
+                Ime = ime,
+                Prezime = prezime
+            };
+            StudentStorage.Students.Add(s);
+            return s;
+        }
     }
 }
