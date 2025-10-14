@@ -8,12 +8,12 @@ namespace MojaApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentController : ControllerBase
+    public class StudentController(MyDbContext db) : ControllerBase
     {
         [HttpGet("{id}")]
         public StudentGetByIdResponse GetById(int id)
         {
-            var s = StudentStorage.Students.Where(x => x.Id == id).Select(x => new StudentGetByIdResponse(
+            var s = db.Students.Where(x => x.Id == id).Select(x => new StudentGetByIdResponse(
                 x.Id,
                 x.Ime,
                 x.Prezime,
@@ -28,34 +28,39 @@ namespace MojaApp.API.Controllers
         [HttpPost]
         public int Add([FromBody]StudentDodajRequest request)
         {
-            var maxID = StudentStorage.Students.Max(x => x.Id);
+            var maxID = db.Students.Max(x => x.Id);
 
             var s = new Student
             {
                 Id = maxID + 1,
                 Ime = request.Ime,
                 Prezime = request.Prezime,
+                BrojIndeksa="",
                 OpstinaRodjenjaId=request.OpstinaRodjenjaId,
-                DatumRodjenja=request.DatumRodjenja
+                DatumRodjenja=request.DatumRodjenja,
+                CreatedTime=DateTime.UtcNow,
+                SlikaStudenta="/nesto.jpg"
             };
-            StudentStorage.Students.Add(s);
+            db.Students.Add(s);
+            db.SaveChanges();
             return s.Id;
         }
 
         [HttpDelete]
         public IActionResult Obrisi(int studentId)
         {
-            var s=StudentStorage.Students.FirstOrDefault(x=>x.Id == studentId);
+            var s=db.Students.FirstOrDefault(x=>x.Id == studentId);
             if (s is null)
                 return BadRequest();
-            StudentStorage.Students.Remove(s);
+            db.Students.Remove(s);
+            db.SaveChanges();
             return Ok();
         }
         
         [HttpGet]
         public List<StudentGetAllResponse> GetAll()
         {
-            return StudentStorage.Students.Select(x => new StudentGetAllResponse(
+            return db.Students.Select(x => new StudentGetAllResponse(
                 x.Id,
                 x.Ime,
                 x.Prezime,
