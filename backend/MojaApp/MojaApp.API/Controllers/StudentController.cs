@@ -9,7 +9,7 @@ namespace MojaApp.API.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("{id}")]
         public Student GetById(int id)
         {
             var s = StudentStorage.Students.FirstOrDefault(x => x.Id == id);
@@ -31,6 +31,12 @@ namespace MojaApp.API.Controllers
             };
             StudentStorage.Students.Add(s);
             return s;
+        }
+
+        [HttpGet]
+        public List<Student> GetAll()
+        {
+            return StudentStorage.Students;
         }
     }
 }
