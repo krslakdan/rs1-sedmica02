@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MojaApp.API.Controllers.Dtos;
 using MojaApp.API.Data;
 using MojaApp.API.Models;
 
@@ -10,43 +11,56 @@ namespace MojaApp.API.Controllers
     public class StudentController : ControllerBase
     {
         [HttpGet("{id}")]
-        public Student GetById(int id)
+        public StudentGetByIdResponse GetById(int id)
         {
-            var s = StudentStorage.Students.FirstOrDefault(x => x.Id == id);
+            var s = StudentStorage.Students.Where(x => x.Id == id).Select(x => new StudentGetByIdResponse(
+                x.Id,
+                x.Ime,
+                x.Prezime,
+                x.SlikaStudenta,
+                x.OpstinaRodjenja == null ? null : new StudentGetByIdResponseOpstina(x.OpstinaRodjenja.description, "123"))).FirstOrDefault();
+
             if (s == null)
                 throw new Exception("nema studenta");
             return s;
         }
 
         [HttpPost]
-        public Student Add(string ime, string prezime)
+        public int Add([FromBody]StudentDodajRequest request)
         {
             var maxID = StudentStorage.Students.Max(x => x.Id);
 
             var s = new Student
             {
                 Id = maxID + 1,
-                Ime = ime,
-                Prezime = prezime
+                Ime = request.Ime,
+                Prezime = request.Prezime,
+                OpstinaRodjenjaId=request.OpstinaRodjenjaId,
+                DatumRodjenja=request.DatumRodjenja
             };
             StudentStorage.Students.Add(s);
-            return s;
+            return s.Id;
         }
 
         [HttpDelete]
-        public int Obrisi(int studentId)
+        public IActionResult Obrisi(int studentId)
         {
             var s=StudentStorage.Students.FirstOrDefault(x=>x.Id == studentId);
             if (s is null)
-                return 0;
+                return BadRequest();
             StudentStorage.Students.Remove(s);
-            return 1;
+            return Ok();
         }
         
         [HttpGet]
-        public List<Student> GetAll()
+        public List<StudentGetAllResponse> GetAll()
         {
-            return StudentStorage.Students;
+            return StudentStorage.Students.Select(x => new StudentGetAllResponse(
+                x.Id,
+                x.Ime,
+                x.Prezime,
+                x.OpstinaRodjenja == null ? null : new StudentGetAllResponseOpstina(x.OpstinaRodjenja.description, "123")
+                )).ToList();
         }
     }
 }
