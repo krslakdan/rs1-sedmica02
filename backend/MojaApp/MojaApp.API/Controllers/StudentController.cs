@@ -32,5 +32,15 @@ namespace MojaApp.API.Controllers
             StudentStorage.Students.Add(s);
             return s;
         }
+
+        [HttpDelete]
+        public int Obrisi(int studentId)
+        {
+            var s=StudentStorage.Students.FirstOrDefault(x=>x.Id == studentId);
+            if (s is null)
+                return 0;
+            StudentStorage.Students.Remove(s);
+            return 1;
+        }
     }
 }
