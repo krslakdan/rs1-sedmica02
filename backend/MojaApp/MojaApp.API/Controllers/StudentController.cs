@@ -28,11 +28,8 @@ namespace MojaApp.API.Controllers
         [HttpPost]
         public int Add([FromBody]StudentDodajRequest request)
         {
-            var maxID = db.Students.Max(x => x.Id);
-
             var s = new Student
             {
-                Id = maxID + 1,
                 Ime = request.Ime,
                 Prezime = request.Prezime,
                 BrojIndeksa="",
