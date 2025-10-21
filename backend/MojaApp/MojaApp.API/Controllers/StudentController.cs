@@ -55,9 +55,17 @@ namespace MojaApp.API.Controllers
         }
         
         [HttpGet]
-        public List<StudentGetAllResponse> GetAll()
+        public List<StudentGetAllResponse> GetAll(string? ime, string? opstina)
         {
-            return db.Students.Select(x => new StudentGetAllResponse(
+            var query = db.Students.AsQueryable();
+            query = query.OrderBy(x => x.Ime).ThenBy(x => x.Prezime);
+
+            if(ime!=null)
+                query = query.Where(x => x.Ime.StartsWith(ime));
+            if(opstina!=null)
+                query = query.Where(x => x.OpstinaRodjenja.description.StartsWith(opstina));
+
+            return query.Select(x => new StudentGetAllResponse(
                 x.Id,
                 x.Ime,
                 x.Prezime,
